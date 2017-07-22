@@ -61,7 +61,6 @@ function getYuidocOptions() {
       helpers: [],
       preprocessor: './docs/preprocessor.js',
       outdir: 'docs/reference/'
-      //, quiet: false
     }
   };
 
@@ -92,6 +91,20 @@ module.exports = function(grunt) {
 
     // read in the package, used for knowing the current version, et al.
     pkg: grunt.file.readJSON('package.json'),
+
+    // Modules of p5
+    modularise : {
+      'p5.Core': '',
+      'p5.Color': 'color',
+      'p5.Image': 'image',
+      'p5.Util': 'utilities',
+      'p5.Math': 'math',
+      'p5.Typography': 'typography', // MAJOR FAIL
+      'p5.WebGL': 'webgl', //breaking
+      'p5.Events': 'events',
+      'p5.IO': 'io' // MAJOR FAIL
+    },
+
     // Configure style consistency checking for this file, the source, and the tests.
     jscs: {
       options: {
@@ -194,7 +207,7 @@ module.exports = function(grunt) {
       yui: {
         options: {
           urls: [
-            'http://localhost:9001/test/test-reference.html'
+            'http://localhost:9001/test/complete-build-tests/test-reference.html'
           ],
           reporter: reporter,
           run: false,
@@ -205,8 +218,8 @@ module.exports = function(grunt) {
       test: {
         options: {
           urls: [
-            'http://localhost:9001/test/test.html',
-            'http://localhost:9001/test/test-minified.html'
+            'http://localhost:9001/test/complete-build-tests/test.html',
+            'http://localhost:9001/test/complete-build-tests/test-minified.html'
           ],
           reporter: reporter,
           run: true,
@@ -215,17 +228,38 @@ module.exports = function(grunt) {
           timeout: 5000
         }
       },
+      modules: {
+        options: {
+          urls: [
+            'http://localhost:9001/test/modules-tests/test-core.html',
+            'http://localhost:9001/test/modules-tests/test-color.html',
+            'http://localhost:9001/test/modules-tests/test-image.html',
+            'http://localhost:9001/test/modules-tests/test-math.html',
+            'http://localhost:9001/test/modules-tests/test-util.html',
+            'http://localhost:9001/test/modules-tests/test-typography.html',
+            'http://localhost:9001/test/modules-tests/test-io.html',
+            'http://localhost:9001/test/modules-tests/test-webgl.html'
+          ],
+          reporter: reporter,
+          run: true,
+          log: true,
+          logErrors: true,
+          timeout: 5000
+        }
+      }
     },
 
     // This is a standalone task, used to automatically update the bower.json
-    // file to match the values in package.json.   It is (likely) used as part
+    // file to match the values in package.json. It is (likely) used as part
     // of the manual release strategy.
     update_json: {
+
       // set some task-level options
       options: {
         src: 'package.json',
         indent: '\t'
       },
+
       // update bower.json with data from package.json
       bower: {
         src: 'package.json', // where to read from
@@ -235,12 +269,9 @@ module.exports = function(grunt) {
       }
     },
 
-    // The actual compile step:  This should collect all the dependencies
-    // and compile them into a single file.
+    // This generates the theme for the documentation from the theme source
+    // files.
     requirejs: {
-
-      // This generates the theme for the documentation from the theme source
-      // files.
       yuidoc_theme: {
         options: {
           baseUrl: './docs/yuidoc-p5-theme-src/scripts/',
@@ -297,6 +328,7 @@ module.exports = function(grunt) {
         }
       }
     },
+
     // This is a static server which is used when testing connectivity for the
     // p5 library. This avoids needing an internet connection to run the tests.
     // It serves all the files in the test directory at http://localhost:9001/
@@ -320,7 +352,7 @@ module.exports = function(grunt) {
     'saucelabs-mocha': {
       all: {
         options: {
-          urls: ['http://127.0.0.1:9001/test/test.html'],
+          urls: ['http://127.0.0.1:9001/test/complete-build-tests/test.html'],
           tunnelTimeout: 5,
           build: process.env.TRAVIS_JOB_ID,
           concurrency: 3,
@@ -343,7 +375,7 @@ module.exports = function(grunt) {
     }
   });
 
-  // Load task definitions
+  // Load build tasks
   grunt.loadTasks('build/tasks');
 
   // Load the external libraries used.
@@ -363,9 +395,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-minjson');
 
   // Create the multitasks.
-  // TODO: "requirejs" is in here to run the "yuidoc_themes" subtask. Is this needed?
-  grunt.registerTask('build', ['browserify', 'uglify', 'requirejs']);
+  grunt.registerTask('build', ['browserify', 'modularise', 'uglify', 'requirejs']);
   grunt.registerTask('test', ['jshint', 'jscs', 'build', 'yuidoc:dev', 'connect', 'mocha', 'mochaTest']);
+  grunt.registerTask('test:build', ['build', 'connect', 'mocha:modules']);
   grunt.registerTask('test:nobuild', ['jshint:test', 'jscs:test', 'connect', 'mocha']);
   grunt.registerTask('yui', ['yuidoc:prod', 'minjson']);
   grunt.registerTask('yui:dev', ['yuidoc:dev', 'minjson']);

@@ -1,23 +1,28 @@
 suite('Files', function() {
 
-  var httpDo = p5.prototype.httpDo;
-  var loadJSON = p5.prototype.loadJSON;
-  var loadStrings = p5.prototype.loadStrings;
-  var loadXML = p5.prototype.loadXML;
+  var myp5 = new p5(function( sketch ) {
+    sketch.setup = function() {};
+    sketch.draw = function() {};
+  });
+
+
+  teardown(function(){
+    myp5.remove();
+  });
 
   //variable for preload
-  var preload = p5.prototype.preload;
+  var preload = myp5.preload;
   var result;
 
   // httpDo
   suite('httpDo()', function(){
     test('should be a function', function(){
-      assert.ok(httpDo);
-      assert.isFunction(httpDo);
+      assert.ok(myp5.httpDo);
+      assert.isFunction(myp5.httpDo);
     });
 
     test('should work when provided with just a path', function(done){
-      httpDo('unit/assets/sentences.txt', function(data){
+      myp5.httpDo('../unit/assets/sentences.txt', function(data){
         assert.ok(data);
         assert.isString(data);
         done();
@@ -25,7 +30,7 @@ suite('Files', function() {
     });
 
     test('should accept method parameter', function(done){
-      httpDo('unit/assets/sentences.txt', 'GET', function(data){
+      myp5.httpDo('../unit/assets/sentences.txt', 'GET', function(data){
         assert.ok(data);
         assert.isString(data);
         done();
@@ -33,7 +38,7 @@ suite('Files', function() {
     });
 
     test('should accept type parameter', function(done){
-      httpDo('unit/assets/array.json', 'text', function(data){
+      myp5.httpDo('../unit/assets/array.json', 'text', function(data){
         assert.ok(data);
         assert.isString(data);
         done();
@@ -41,7 +46,7 @@ suite('Files', function() {
     });
 
     test('should accept method and type parameter together', function(done){
-      httpDo('unit/assets/array.json', 'GET', 'text', function(data){
+      myp5.httpDo('../unit/assets/array.json', 'GET', 'text', function(data){
         assert.ok(data);
         assert.isString(data);
         done();
@@ -49,7 +54,7 @@ suite('Files', function() {
     });
 
     test('should pass error object to error callback function', function(done){
-      httpDo('unit/assets/sen.txt', function(data){
+      myp5.httpDo('../unit/assets/sen.txt', function(data){
         // should not be called
       }, function(err){
         assert.isObject(err, 'err is an object');
@@ -61,22 +66,23 @@ suite('Files', function() {
   });
 
   // tests while preload is true without callbacks
-  //p5.prototype.preload = function() {};
+  //myp5.preload = function() {};
   preload = true;
-
-  test('preload is a Boolean', function() {
-    assert.typeOf(preload, 'Boolean');
-  });
 
   // loadJSON()
   suite('loadJSON() in Preload', function () {
+
+    test('preload is a Boolean', function() {
+      assert.typeOf(preload, 'Boolean');
+    });
+
     test('should be a function', function() {
-      assert.ok(loadJSON);
-      assert.typeOf(loadJSON, 'function');
+      assert.ok(myp5.loadJSON);
+      assert.typeOf(myp5.loadJSON, 'function');
     });
 
     test('should return an Object', function() {
-      result = loadJSON('unit/assets/array.json');
+      result = myp5.loadJSON('../unit/assets/array.json');
       assert.ok(result);
       assert.isObject(result, 'result is an object');
     });
@@ -84,13 +90,14 @@ suite('Files', function() {
 
   // loadStrings()
   suite('loadStrings() in Preload', function(){
+
     test('should be a function', function() {
-      assert.ok(loadStrings);
-      assert.typeOf(loadStrings, 'function');
+      assert.ok(myp5.loadStrings);
+      assert.typeOf(myp5.loadStrings, 'function');
     });
 
     test('should return an array', function(){
-      result = loadStrings('unit/assets/sentences.txt');
+      result = myp5.loadStrings('../unit/assets/sentences.txt');
       assert.ok(result);
       assert.isArray(result, 'result is and array');
     });
@@ -99,12 +106,12 @@ suite('Files', function() {
   // loadXML()
   suite('loadXML() in Preload', function(){
     test('should be a function', function(){
-      assert.ok(loadXML);
-      assert.typeOf(loadXML, 'function');
+      assert.ok(myp5.loadXML);
+      assert.typeOf(myp5.loadXML, 'function');
     });
 
     // test('should return an Object', function() {
-    //   result = loadXML('unit/assets/books.xml');
+    //   result = loadXML('../unit/assets/books.xml');
     //   assert.ok(result);
     //   assert.isObject(result, 'result is an object');
     // });
@@ -114,20 +121,20 @@ suite('Files', function() {
   preload = false;
 
   // loadJSON()
-  suite('p5.prototype.loadJSON', function() {
+  suite('myp5.loadJSON', function() {
     test('should be a function', function() {
-      assert.ok(loadJSON);
-      assert.typeOf(loadJSON, 'function');
+      assert.ok(myp5.loadJSON);
+      assert.typeOf(myp5.loadJSON, 'function');
     });
 
     test('should call callback function if provided', function(done){
-      result = loadJSON('unit/assets/array.json', function(data){
+      result = myp5.loadJSON('../unit/assets/array.json', function(data){
         done();
       });
     });
 
     test('should pass an Array to callback function', function(done){
-      result = loadJSON('unit/assets/array.json', function(data){
+      result = myp5.loadJSON('../unit/assets/array.json', function(data){
         assert.isArray(data, 'Array passed to callback function');
         assert.lengthOf(data, 3, 'length of data is 3');
         done();
@@ -135,13 +142,13 @@ suite('Files', function() {
     });
 
     test('should call error callback function if provided', function(done){
-      result = loadJSON('unit/assets/arr.json', function(data){}, function(){
+      result = myp5.loadJSON('../unit/assets/arr.json', function(data){}, function(){
         done();
       });
     });
 
     test('should pass error object to error callback function', function(done) {
-      result = loadJSON('unit/assets/arr.json', function(data){
+      result = myp5.loadJSON('../unit/assets/arr.json', function(data){
         // should not be called
       }, function(err){
         assert.isObject(err, 'err is an object');
@@ -154,7 +161,7 @@ suite('Files', function() {
     /*test('should allow json to override jsonp in 3rd param',
       function(done){
 
-        var url = 'http://localhost:9001/unit/assets/array.json';
+        var url = 'http://localhost:9001/../unit/assets/array.json';
         var datatype = 'json';
         var myCallback = function(resp){
           assert.ok(resp);
@@ -166,33 +173,33 @@ suite('Files', function() {
   });
 
   // loadStrings()
-  suite('p5.prototype.loadStrings', function() {
+  suite('myp5.loadStrings', function() {
     test('should be a function', function() {
-      assert.ok(loadStrings);
-      assert.typeOf(loadStrings, 'function');
+      assert.ok(myp5.loadStrings);
+      assert.typeOf(myp5.loadStrings, 'function');
     });
 
     test('should call callback function if provided', function(done){
-      result = loadStrings('unit/assets/sentences.txt', function(data){
+      result = myp5.loadStrings('../unit/assets/sentences.txt', function(data){
         done();
       });
     });
 
     test('should pass an Array to callback function', function(){
-      result = loadStrings('unit/assets/sentences.txt', function(data){
+      result = myp5.loadStrings('../unit/assets/sentences.txt', function(data){
         assert.isArray(data, 'Array passed to callback function');
         assert.lengthOf(data, 68, 'length of data is 68');
       });
     });
 
     test('should call error callback function if provided', function(done){
-      result = loadStrings('unit/assets/sen.txt', function(data){}, function(){
+      result = myp5.loadStrings('../unit/assets/sen.txt', function(data){}, function(){
         done();
       });
     });
 
     test('should pass error object to error callback function', function(done) {
-      result = loadStrings('unit/assets/sen.txt', function(data){
+      result = myp5.loadStrings('../unit/assets/sen.txt', function(data){
         // should not be called
       }, function(err){
         assert.isObject(err, 'err is an object');
@@ -204,21 +211,21 @@ suite('Files', function() {
   });
 
   // loadXML()
-  suite('p5.prototype.loadXML', function(){
+  suite('myp5.loadXML', function(){
     test('should be a function', function(){
-      assert.ok(loadXML);
-      assert.typeOf(loadXML, 'function');
+      assert.ok(myp5.loadXML);
+      assert.typeOf(myp5.loadXML, 'function');
     });
 
     // Missing reference to parseXML, might need some test suite rethink
     // test('should call callback function if provided', function(done){
-    //   result = loadXML('unit/assets/books.xml', function(data){
+    //   result = loadXML('../unit/assets/books.xml', function(data){
     //     done();
     //   });
     // });
 
     // test('should pass an Object to callback function', function(){
-    //   result = loadXML('unit/assets/books.xml', function(data){
+    //   result = loadXML('../unit/assets/books.xml', function(data){
     //     console.log(data);
     //     assert.isObject(data);
     //   });
@@ -226,13 +233,11 @@ suite('Files', function() {
   });
 
 
-  var loadTable = p5.prototype.loadTable;
-
-  suite('p5.prototype.loadTable',function(){
-    var url = 'unit/assets/csv.csv';
+  suite('myp5.loadTable',function(){
+    var url = '../unit/assets/csv.csv';
 
     test('should be a function', function(){
-      assert.isFunction(loadTable);
+      assert.isFunction(myp5.loadTable);
     });
 
     test('should load a file without options',function(done) {
@@ -240,7 +245,7 @@ suite('Files', function() {
         assert.ok(resp);
         done();
       };
-      loadTable(url, myCallback);
+      myp5.loadTable(url, myCallback);
     });
 
     test('the loaded file should be correct',function(done){
@@ -250,7 +255,7 @@ suite('Files', function() {
         assert.strictEqual(resp.getRow(1).getNum(1), 31);
         done();
       };
-      loadTable(url, myCallback);
+      myp5.loadTable(url, myCallback);
     });
 
     test('using the csv option works', function(done){
@@ -260,12 +265,12 @@ suite('Files', function() {
         assert.strictEqual(resp.getRow(1).getNum(1), 31);
         done();
       };
-      loadTable(url, 'csv', myCallback);
+      myp5.loadTable(url, 'csv', myCallback);
     });
 
     test('using the csv and tsv options fails', function(){
       var fn = function(){
-        loadTable(url, 'csv', 'tsv');
+        myp5.loadTable(url, 'csv', 'tsv');
       };
       assert.throw(fn, 'Cannot set multiple separator types.');
     });
@@ -277,7 +282,7 @@ suite('Files', function() {
         assert.strictEqual(resp.getRow(0).getNum('age'), 31);
         done();
       };
-      loadTable(url, 'header', myCallback);
+      myp5.loadTable(url, 'header', myCallback);
     });
 
     test('using the header and csv options together works', function(done){
@@ -287,7 +292,7 @@ suite('Files', function() {
         assert.strictEqual(resp.getRow(0).getNum('age'), 31);
         done();
       };
-      loadTable(url,'header', 'csv', myCallback);
+      myp5.loadTable(url,'header', 'csv', myCallback);
     });
 
     test('CSV files should handle commas within quoted fields',function(done){
@@ -299,7 +304,7 @@ suite('Files', function() {
         assert.equal(resp.getRow(2).getString(1), 11);
         done();
       };
-      loadTable(url, myCallback);
+      myp5.loadTable(url, myCallback);
     });
 
     test('CSV files should handle escaped quotes and returns within quoted fields',function(done){
@@ -308,7 +313,7 @@ suite('Files', function() {
         assert.equal(resp.getRow(3).get(0), 'David,\nSr. "the boss"');
         done();
       };
-      loadTable(url, myCallback);
+      myp5.loadTable(url, myCallback);
     });
   });
 
