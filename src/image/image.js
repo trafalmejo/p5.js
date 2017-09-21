@@ -39,7 +39,7 @@ var frames = [];
  * updatePixels() function must be run to update the changes.
  *
  * @method createImage
- * @param  {Integer} width  width in pixels
+ * @param  {Integer} width  width in pixel
  * @param  {Integer} height height in pixels
  * @return {p5.Image}       the p5.Image object
  * @example
